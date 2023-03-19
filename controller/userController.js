@@ -1,7 +1,9 @@
 const MongoClient = require("mongodb").MongoClient;
 const { ObjectId } = require("mongodb");
 const MongoUtil = require("../MongoUtil.js");
+const bcrypt = require("bcryptjs")
 require('dotenv').config();
+const jwt = require("jsonwebtoken")
 
 const MONGO_URI = process.env.MONGO_URI;
 const DB = "project2_Quizholics"
@@ -22,80 +24,127 @@ module.exports = {
 
     async updateUser(req, res) {
         const db = await MongoUtil.connect(MONGO_URI, DB);
-        let userid= req.params.userid
+        let userid = req.params.userid
         const o_id = new ObjectId(userid)
         const update = req.body
-       try{ 
-        console.log(update)
-        const result= await db.collection(userCollection).findOneAndUpdate({"_id": o_id},
-        {
-            "$set": 
-               update
-            
-        })
+        try {
+            console.log(update)
+            const result = await db.collection(userCollection).findOneAndUpdate({ "_id": o_id },
+                {
+                    "$set":
+                        update
 
-        res.send("user Updated")
+                })
 
-       }catch(err){
-       console.log(err)
-        res.send("failed")
-       }
+            res.send("user Updated")
+
+        } catch (err) {
+            console.log(err)
+            res.send("failed")
+        }
     },
 
     async deleteUser(req, res) {
         const db = await MongoUtil.connect(MONGO_URI, DB);
-        let userid= req.params.userid
+        let userid = req.params.userid
         const o_id = new ObjectId(userid)
-       try{ 
-        
-        const result= await db.collection(userCollection).deleteOne({"_id": o_id})
+        try {
 
-        res.send("user Deleted")
+            const result = await db.collection(userCollection).deleteOne({ "_id": o_id })
 
-       }catch(err){
-       
-        res.send("failed")
-       }
+            res.send("user Deleted")
+
+        } catch (err) {
+
+            res.send("failed")
+        }
     },
 
     async getUser(req, res) {
         const db = await MongoUtil.connect(MONGO_URI, DB);
-        let userid= req.params.userid
+        let userid = req.params.userid
         console.log(userid)
         const o_id = new ObjectId(userid)
-       try{ 
-        
-        const result= await db.collection(userCollection).find({"_id": o_id}).toArray()
-        res.json({
-            result
-        })
-       }catch(err){
-        console.log(err)
-        res.send("failed")
-       }
+        try {
+
+            const result = await db.collection(userCollection).find({ "_id": o_id }).toArray()
+            res.json({
+                result
+            })
+        } catch (err) {
+            console.log(err)
+            res.send("failed")
+        }
     },
 
     async addUser(req, res) {
         const db = await MongoUtil.connect(MONGO_URI, DB);
-        
-        try{
-        db.collection(userCollection).insertOne({
-            "firstName": req.body.firstName,
-            "lastName" : req.body.lastName,
-            "email" : req.body.email,
-            "quizCreated": req.body.quizCreated,
-            "quizDone" : req.body.quizDone,
-            "memberSince" : req.body.memberSince
-        })
-        res.send("user created")
 
-    }catch(err){
-        res.send("error inserting user")
+
+        //username/email
+        const oldUser = await db.collection(userCollection).findOne({ "email": req.body.email })
+        if (oldUser) {
+            return res.status(409).send("User Already Exist. Please Log in")
+        }
+
+        //encrypt password
+
+        encrypytedPassword = await bcrypt.hash(req.body.password, 8)
+
+
+
+        try {
+            db.collection(userCollection).insertOne({
+                "firstName": req.body.firstName,
+                "lastName": req.body.lastName,
+                "email": req.body.email,
+                "quizCreated": req.body.quizCreated,
+                "quizDone": req.body.quizDone,
+                "memberSince": req.body.memberSince,
+                "password": encrypytedPassword
+            })
+            res.send("user created")
+
+        } catch (err) {
+            res.send("error inserting user")
+        }
+
+
+
+    },
+
+    async login(req,res){
+        const db = await MongoUtil.connect(MONGO_URI, DB)
+        try{
+            const email = req.body.email
+            const password = req.body.password
+            if (!(email && password)){
+                res.status(400).send("All input is required");
+            }
+            const user= await db.collection(userCollection).findOne({"email":email})
+            
+            if(user && (await bcrypt.compare(password,user.password))){
+                const token = jwt.sign(
+                    {"email": email},
+                    process.env.TOKEN_KEY,
+                    {
+                        "expiresIn": "12h"
+                    }
+                );
+                user.token = token
+                res.json(user).status(200)
+            }else{
+            res.status(400).send("Invalid email/password")}
+            
+            
+        }catch(err){
+            console.log(err)
+            res.send("error logging in")
+        }
+
+    
     }
-        
-        
-        
-    }
+    
 
 
 

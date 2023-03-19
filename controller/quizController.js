@@ -19,11 +19,29 @@ module.exports = {
         
     },
 
-    updateUser(req, res) {
-        res.send("userUpdated")
+    async deleteQuiz(req, res) {
+        const db = await MongoUtil.connect(MONGO_URI, DB);
+        let quizid= req.params.quizId
+        const o_id = new ObjectId(quizid)
+       try{ 
+        
+        const result= await db.collection(collection).deleteOne({"_id": o_id})
+
+        res.send("quiz Deleted")
+
+       }catch(err){
+       
+        res.send("failed")
+       }
     }
 
+    // async updateQuiz(req,res) {
+
+    // }
 
 
+    // async addQuiz(req,res) {
+
+    // }
 
 }

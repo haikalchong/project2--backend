@@ -1,11 +1,18 @@
 const userController = require("./controller/userController")
 const quizController = require("./controller/quizController")
 const genreController = require("./controller/genreController")
+const questionController = require("./controller/questionController")
+const authentication = require("./middleware/authentication")
+
 
 
 module.exports = (app) => {
     app.get("/",function(req,res){
         res.send("yay")
+    })
+
+    app.get("/welcome", authentication,function(req,res){
+        res.send("Welcome Member")
     })
     // this is to get one user
     app.get('/user/:userid', userController.getUser)
@@ -22,14 +29,23 @@ module.exports = (app) => {
     //this is to update user
     app.put("/user/:userid", userController.updateUser)
 
+    app.post("/login", userController.login)
 
 
 
 
-
-
+    //get all quiz
     app.get("/quiz",quizController.getAllQuiz)
 
+    //delete a quiz
+    app.delete("/quiz/:quizId",quizController.deleteQuiz)
+
+    //update a quiz
+    // app.put("/quiz/:quizId".quizController.updateQuiz)
+
+
+
+    // get all genre
     app.get("/genre", genreController.getAllGenre)
 
     
