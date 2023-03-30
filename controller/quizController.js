@@ -33,15 +33,34 @@ module.exports = {
        
         res.send("failed")
        }
-    }
+    },
 
     // async updateQuiz(req,res) {
 
     // }
 
 
-    // async addQuiz(req,res) {
+    async addQuiz(req, res) {
+        const db = await MongoUtil.connect(MONGO_URI, DB);
 
-    // }
+        try {
+           const result =  await db.collection(collection).insertOne({
+                "quizName": req.body.quizName,
+                "topic": req.body.topic,
+                "createdBy":req.body.createdBy,
+                "quizLevel": req.body.level,
+                "totalQuestions": req.body.totalQuestions,
+                "questions": req.body.questions,
+            })
+            res.json(result)
+
+        } catch (err) {
+            res.send("error inserting quiz")
+        }
+
+
+
+    },
+
 
 }

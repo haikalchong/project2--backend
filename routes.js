@@ -37,6 +37,9 @@ module.exports = (app) => {
     //get all quiz
     app.get("/quiz",quizController.getAllQuiz)
 
+    //add a quiz
+    app.post("/quiz",quizController.addQuiz)
+
     //delete a quiz
     app.delete("/quiz/:quizId",quizController.deleteQuiz)
 
@@ -47,6 +50,8 @@ module.exports = (app) => {
 
     // get all genre
     app.get("/genre", genreController.getAllGenre)
+
+    app.get("/genre/:topic", genreController.getTopic)
 
     
 }

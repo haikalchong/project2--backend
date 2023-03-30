@@ -19,4 +19,48 @@ module.exports = {
         
     },
 
+
+    async updateTopic(rq,res) {
+        const db = await MongoUtil.connect(MONGO_URI,DB);
+        let topic=req.params.topic
+        const update = req.body
+        try {
+            
+            const result = await db.collection(userCollection).findOneAndUpdate({ "topic": topic },
+                {
+                    "$set":
+
+                        update
+
+                })
+
+            res.send("Topic Updated")
+
+        } catch (err) {
+            console.log(err)
+            res.send("failed")
+        }
+
+
+    },
+
+    async getTopic(req, res) {
+        const db = await MongoUtil.connect(MONGO_URI, DB);
+        let topic = req.params.topic
+        console.log(topic)
+         
+        try {
+
+            const result = await db.collection(collection).find({ "topic": topic }).toArray()
+            res.json({
+                result
+            })
+        } catch (err) {
+            console.log(err)
+            res.send("failed")
+        }
+    },
+
+
+
 }
