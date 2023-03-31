@@ -48,7 +48,7 @@ module.exports = {
                 "quizName": req.body.quizName,
                 "topic": req.body.topic,
                 "createdBy":req.body.createdBy,
-                "quizLevel": req.body.level,
+                "quizLevel": req.body.quizLevel,
                 "totalQuestions": req.body.totalQuestions,
                 "questions": req.body.questions,
             })

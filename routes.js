@@ -31,6 +31,10 @@ module.exports = (app) => {
 
     app.post("/login", userController.login)
 
+    //add quiz for user for quiz created
+
+    app.put("/userQuiz/:userid", userController.updateUserQuiz)
+
 
 
 
@@ -52,6 +56,8 @@ module.exports = (app) => {
     app.get("/genre", genreController.getAllGenre)
 
     app.get("/genre/:topic", genreController.getTopic)
+
+    app.put("/genre/:topic",genreController.updateTopic)
 
     
 }

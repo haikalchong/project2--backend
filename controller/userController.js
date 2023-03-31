@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken")
 
 const MONGO_URI = process.env.MONGO_URI;
 const DB = "project2_Quizholics"
-const userCollection = "Users"
+const collection = "Users"
 
 
 
@@ -15,7 +15,7 @@ module.exports = {
     async getAllUsers(req, res) {
         const db = await MongoUtil.connect(MONGO_URI, DB);
 
-        const result = await db.collection(userCollection).find().toArray()
+        const result = await db.collection(collection).find().toArray()
         res.json({
             result
         })
@@ -29,7 +29,7 @@ module.exports = {
         const update = req.body
         try {
             console.log(update)
-            const result = await db.collection(userCollection).findOneAndUpdate({ "_id": o_id },
+            const result = await db.collection(collection).findOneAndUpdate({ "_id": o_id },
                 {
                     "$set":
                         update
@@ -50,7 +50,7 @@ module.exports = {
         const o_id = new ObjectId(userid)
         try {
 
-            const result = await db.collection(userCollection).deleteOne({ "_id": o_id })
+            const result = await db.collection(collection).deleteOne({ "_id": o_id })
 
             res.send("user Deleted")
 
@@ -67,7 +67,7 @@ module.exports = {
         const o_id = new ObjectId(userid)
         try {
 
-            const result = await db.collection(userCollection).find({ "_id": o_id }).toArray()
+            const result = await db.collection(collection).find({ "_id": o_id }).toArray()
             res.json({
                 result
             })
@@ -82,7 +82,7 @@ module.exports = {
 
 
         //username/email
-        const oldUser = await db.collection(userCollection).findOne({ "email": req.body.email })
+        const oldUser = await db.collection(collection).findOne({ "email": req.body.email })
         if (oldUser) {
             return res.status(409).send("User Already Exist. Please Log in")
         }
@@ -94,7 +94,7 @@ module.exports = {
 
 
         try {
-            db.collection(userCollection).insertOne({
+            db.collection(collection).insertOne({
                 "firstName": req.body.firstName,
                 "lastName": req.body.lastName,
                 "email": req.body.email,
@@ -121,7 +121,7 @@ module.exports = {
             if (!(email && password)){
                 res.status(400).send("All input is required");
             }
-            const user= await db.collection(userCollection).findOne({"email":email})
+            const user= await db.collection(collection).findOne({"email":email})
             
             if(user && (await bcrypt.compare(password,user.password))){
                 const token = jwt.sign(
@@ -143,6 +143,30 @@ module.exports = {
         }
 
     
+    },
+
+    async updateUserQuiz(req,res){
+
+        const db = await MongoUtil.connect(MONGO_URI,DB);
+        let userId=new ObjectId(req.params.userid)
+        const update = req.body.quizId
+        console.log(userId)
+        try {
+            
+            const result = await db.collection(collection).findOneAndUpdate({ "_id": userId },
+                {
+                    "$push":{quizCreated: update}
+
+                        
+
+                })
+                console.log(result)
+            res.send("User Updated")
+
+        } catch (err) {
+            console.log(err)
+            res.send("failed")
+        }
     }
     
 

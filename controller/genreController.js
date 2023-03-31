@@ -20,17 +20,18 @@ module.exports = {
     },
 
 
-    async updateTopic(rq,res) {
+    async updateTopic(req,res) {
         const db = await MongoUtil.connect(MONGO_URI,DB);
         let topic=req.params.topic
-        const update = req.body
+        const update = req.body.quizId
+        console.log(req.body)
         try {
             
-            const result = await db.collection(userCollection).findOneAndUpdate({ "topic": topic },
+            const result = await db.collection(collection).findOneAndUpdate({ "topic": topic },
                 {
-                    "$set":
+                    "$push":{quizId: update}
 
-                        update
+                        
 
                 })
 
