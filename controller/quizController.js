@@ -51,6 +51,7 @@ module.exports = {
                 "quizLevel": req.body.quizLevel,
                 "totalQuestions": req.body.totalQuestions,
                 "questions": req.body.questions,
+                "descriptions":req.body.descriptions
             })
             res.json(result)
 
