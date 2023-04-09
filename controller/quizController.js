@@ -51,7 +51,7 @@ module.exports = {
                 "quizLevel": req.body.quizLevel,
                 "totalQuestions": req.body.totalQuestions,
                 "questions": req.body.questions,
-                "descriptions":req.body.descriptions
+                "descriptions":req.body.description
             })
             res.json(result)
 
@@ -61,6 +61,23 @@ module.exports = {
 
 
 
+    },
+
+    async getUserQuiz(req, res) {
+        const db = await MongoUtil.connect(MONGO_URI, DB);
+        let quizId = req.params.quizId
+        console.log(quizId)
+        const o_id = new ObjectId(quizId)
+        try {
+
+            const result = await db.collection(collection).find({ "_id": o_id }).toArray()
+            res.json({
+                result
+            })
+        } catch (err) {
+            console.log(err)
+            res.send("failed")
+        }
     },
 
 

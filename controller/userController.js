@@ -28,15 +28,22 @@ module.exports = {
         const o_id = new ObjectId(userid)
         const update = req.body
         try {
-            console.log(update)
+            
             const result = await db.collection(collection).findOneAndUpdate({ "_id": o_id },
                 {
                     "$set":
-                        update
+                        update,
+                    
+                    
 
+                },
+                {
+                    returnNewDocument:true,
+                    returnDocument:'after'
                 })
+                console.log("resuglt",result.value)
 
-            res.send("user Updated")
+            res.json({result})
 
         } catch (err) {
             console.log(err)
@@ -82,7 +89,7 @@ module.exports = {
 
 
         //username/email
-        const oldUser = await db.collection(collection).findOne({ "email": req.body.email })
+        const oldUser = await db.collection(collection).findOne({ "username": req.body.username })
         if (oldUser) {
             return res.status(409).send("User Already Exist. Please Log in")
         }
@@ -97,13 +104,12 @@ module.exports = {
             db.collection(collection).insertOne({
                 "firstName": req.body.firstName,
                 "lastName": req.body.lastName,
-                "email": req.body.email,
+                "username": req.body.username,
                 "quizCreated": req.body.quizCreated,
-                "quizDone": req.body.quizDone,
                 "memberSince": req.body.memberSince,
                 "password": encrypytedPassword
             })
-            res.send("user created")
+            res.status(200).send("user created")
 
         } catch (err) {
             res.send("error inserting user")
@@ -116,16 +122,16 @@ module.exports = {
     async login(req,res){
         const db = await MongoUtil.connect(MONGO_URI, DB)
         try{
-            const email = req.body.email
+            const username = req.body.username
             const password = req.body.password
-            if (!(email && password)){
+            if (!(username && password)){
                 res.status(400).send("All input is required");
             }
-            const user= await db.collection(collection).findOne({"email":email})
+            const user= await db.collection(collection).findOne({"username":username})
             
             if(user && (await bcrypt.compare(password,user.password))){
                 const token = jwt.sign(
-                    {"email": email},
+                    {"username": username},
                     process.env.TOKEN_KEY,
                     {
                         "expiresIn": "12h"
