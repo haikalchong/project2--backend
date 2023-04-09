@@ -48,7 +48,7 @@ module.exports = (app) => {
     app.delete("/quiz/:quizId",quizController.deleteQuiz)
 
     //get user quiz
-    app.get("/userQuiz/:quizId", quizController.getUserQuiz)
+    app.get("/userGetQuiz/:id", quizController.getUserQuiz)
 
     //update a quiz
     // app.put("/quiz/:quizId".quizController.updateQuiz)

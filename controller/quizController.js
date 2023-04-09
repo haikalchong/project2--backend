@@ -1,4 +1,5 @@
 const MongoClient = require("mongodb").MongoClient;
+const { ObjectId } = require("mongodb");
 const MongoUtil = require("../MongoUtil.js");
 require('dotenv').config();
 
@@ -65,12 +66,13 @@ module.exports = {
 
     async getUserQuiz(req, res) {
         const db = await MongoUtil.connect(MONGO_URI, DB);
-        let quizId = req.params.quizId
-        console.log(quizId)
-        const o_id = new ObjectId(quizId)
+        let userid = req.params.id
+    
+        console.log(userid)
+        
         try {
 
-            const result = await db.collection(collection).find({ "_id": o_id }).toArray()
+            const result = await db.collection(collection).find({ "createdBy": req.params.id }).toArray()
             res.json({
                 result
             })
