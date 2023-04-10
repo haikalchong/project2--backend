@@ -15,6 +15,6 @@ app.use(cors());
 app.use(express.urlencoded({extended:true}));
 routes(app)
 
-app.listen(2999,function(){
+app.listen(process.env.PORT || 2999,function(){
     console.log("server has started")
 })
